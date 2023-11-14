@@ -15,36 +15,47 @@ window.addEventListener("DOMContentLoaded", () => {
 
   countTodo();
 
+  const setDataToElement = (element, todoItem, setComplete) => {
+    element.setAttribute("data-id", todoItem.id);
+    console.log(todoItem.complete);
+    if (setComplete) {
+      if (todoItem.complete && todoItem.complete == 1) {
+        element.setAttribute("data-id-complete", todoItem.complete);
+        element.classList.add("bg-success");
+      } else {
+        element.setAttribute("data-id-complete", 0);
+      }
+    }
+  };
+
   const addTodoItem = (todoItem) => {
     const todoRow = document.createElement("div");
     todoRow.className = "list-group-item list-group-item-action";
     todoRow.id = `todo-row-${todoItem.id}`;
-    todoRow.setAttribute("data-id", todoItem.id);
-    if (todoItem.complete) {
-      todoRow.setAttribute("data-id-complete", todoItem.complete);
-      console.log(todoItem.complete);
-      if (todoItem.complete == "1") {
-        todoRow.classList.add("bg-success");
-      }
-    } else {
-      todoRow.setAttribute("data-id-complete", 0);
-    }
+    console.log(todoItem);
+    setDataToElement(todoRow, todoItem, true);
 
     todoRow.addEventListener("dblclick", (e) => {
-      let isComplete = e.target.getAttribute("data-id-complete");
-      let toggleComplete = isComplete === "1" ? "0" : "1";
+      const changeTodoId = e.target.getAttribute("data-id");
+      const changeTodoRow = document.getElementById(`todo-row-${changeTodoId}`);
+
+      let isChangeComplete = changeTodoRow.getAttribute("data-id-complete");
+      let toggleComplete = isChangeComplete === "1" ? "0" : "1";
       ipcRenderer.invoke("todo:complete", e.target.getAttribute("data-id"), toggleComplete);
-      e.target.classList.toggle("bg-success");
-      e.target.setAttribute("data-id-complete", toggleComplete);
+      changeTodoRow.classList.toggle("bg-success");
+      changeTodoRow.setAttribute("data-id-complete", toggleComplete);
     });
 
     const todoHeading = document.createElement("div");
     todoHeading.className = "d-flex w-100 justify-content-between";
+    setDataToElement(todoHeading, todoItem, false);
     const todoHeadingH5 = document.createElement("h5");
     todoHeadingH5.className = "mb-1";
     todoHeadingH5.innerText = todoItem.text;
+    setDataToElement(todoHeadingH5, todoItem, false);
     const todoHeadingSmall = document.createElement("small");
     todoHeadingSmall.className = "text-body-secondary";
+    setDataToElement(todoHeadingSmall, todoItem, false);
     const todoHeadingSmallDelete = document.createElement("i");
     todoHeadingSmallDelete.setAttribute("data-id", todoItem.id);
     // todoHeadingSmallDelete.className = "fa-regular fa-trash-can";
@@ -52,6 +63,7 @@ window.addEventListener("DOMContentLoaded", () => {
     todoHeadingSmallDelete.style.fontSize = "large";
     todoHeadingSmallDelete.style.cursor = "pointer";
     todoHeadingSmallDelete.style.margin = "15px 0;";
+    setDataToElement(todoHeadingSmallDelete, todoItem, false);
     todoHeadingSmallDelete.addEventListener("click", (event) => {
       if (confirm("Are you sure you want to delete it?")) {
         ipcRenderer.invoke("todo:delete", event.target.getAttribute("data-id"));
@@ -68,9 +80,11 @@ window.addEventListener("DOMContentLoaded", () => {
     const todoRowP = document.createElement("p");
     todoRowP.className = "mb-1";
     todoRowP.innerText = "You can mark completed to-do as done by clicking on them.";
+    setDataToElement(todoRowP, todoItem, false);
     const todoRowSmall = document.createElement("small");
     todoRowSmall.className = "text-body-secondary";
     todoRowSmall.innerText = todoItem.date;
+    setDataToElement(todoRowSmall, todoItem, false);
 
     todoRow.appendChild(todoHeading);
     todoRow.appendChild(todoRowP);
