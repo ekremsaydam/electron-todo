@@ -8,7 +8,7 @@ const isMac = process.platform === "darwin";
 const isDev = process.env.NODE_ENV === "development";
 // const isDev = true;
 
-let mainWindow = new BrowserWindow();
+let mainWindow;
 const createMainWindow = () => {
   mainWindow = new BrowserWindow({
     width: 800,
