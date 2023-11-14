@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="./css/bootstrap.min.css" />
+    <!-- <link rel="stylesheet" href="./css/fontawesome.min.css" />
+    <link rel="stylesheet" href="./css/brands.min.css" />
+    <link rel="stylesheet" href="./css/solid.min.css" /> -->
+    <link rel="stylesheet" href="./css/bootstrap-icons.min.css" />
+    <script src="./mainWindowRenderer.js" defer></script>
+  </head>
+  <body>
+    <nav class="navbar bg-body-tertiary sticky-top">
+      <div class="container-fluid">
+        <a class="navbar-brand">To Do List</a>
+        <div class="d-flex" role="add">
+          <input
+            id="todoValue"
+            class="form-control me-2"
+            type="add"
+            placeholder="Add"
+            aria-label="Add"
+          />
+          <button id="addBtn" class="btn btn-outline-success m-1">Add</button>
+          <button id="closeBtn" class="btn btn-outline-danger m-1">Close</button>
+        </div>
+      </div>
+    </nav>
+    <main class="pb-5">
+      <div id="todo-list-container" class="list-group"></div>
+      <div
+        class="todo-item-alert list-group list-group-item list-group-item-action bg-warning"
+        aria-current="true"
+      >
+        <div class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1">There is no to-do list.</h5>
+          <small></small>
+        </div>
+        <p class="mb-1">Please add items to the to-do list.</p>
+        <small>You can use the add button at the top.</small>
+      </div>
+    </main>
+    <nav class="navbar fixed-bottom bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Todo Count: <span id="todo-count"></span></a>
+      </div>
+    </nav>
+  </body>
+</html>
