@@ -18,6 +18,25 @@ window.addEventListener("DOMContentLoaded", () => {
   const addTodoItem = (todoItem) => {
     const todoRow = document.createElement("div");
     todoRow.className = "list-group-item list-group-item-action";
+    todoRow.id = `todo-row-${todoItem.id}`;
+    todoRow.setAttribute("data-id", todoItem.id);
+    if (todoItem.complete) {
+      todoRow.setAttribute("data-id-complete", todoItem.complete);
+      console.log(todoItem.complete);
+      if (todoItem.complete == "1") {
+        todoRow.classList.add("bg-success");
+      }
+    } else {
+      todoRow.setAttribute("data-id-complete", 0);
+    }
+
+    todoRow.addEventListener("dblclick", (e) => {
+      let isComplete = e.target.getAttribute("data-id-complete");
+      let toggleComplete = isComplete === "1" ? "0" : "1";
+      ipcRenderer.invoke("todo:complete", e.target.getAttribute("data-id"), toggleComplete);
+      e.target.classList.toggle("bg-success");
+      e.target.setAttribute("data-id-complete", toggleComplete);
+    });
 
     const todoHeading = document.createElement("div");
     todoHeading.className = "d-flex w-100 justify-content-between";
@@ -51,7 +70,7 @@ window.addEventListener("DOMContentLoaded", () => {
     todoRowP.innerText = "You can mark completed to-do as done by clicking on them.";
     const todoRowSmall = document.createElement("small");
     todoRowSmall.className = "text-body-secondary";
-    todoRowSmall.innerText = todoItem.addedOnDate;
+    todoRowSmall.innerText = todoItem.date;
 
     todoRow.appendChild(todoHeading);
     todoRow.appendChild(todoRowP);

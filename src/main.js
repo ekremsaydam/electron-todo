@@ -143,6 +143,23 @@ const handlerIpcMain = () => {
       mainWindowFocus();
     });
   });
+
+  ipcMain.handle("todo:complete", (_event, completeTodoId, isComplete) => {
+    console.log(completeTodoId, isComplete);
+    if (completeTodoId) {
+      db.run(
+        "UPDATE todo SET complete=? WHERE id=?",
+        [isComplete, completeTodoId],
+        function (error) {
+          if (error) {
+            console.log(error.message);
+            return;
+          }
+          console.log(this);
+        }
+      );
+    }
+  });
 };
 
 app.whenReady().then(() => {
