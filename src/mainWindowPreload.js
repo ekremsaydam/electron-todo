@@ -58,11 +58,17 @@ window.addEventListener("DOMContentLoaded", () => {
   };
 
   const todoValue = document.getElementById("todoValue");
+  todoValue.focus();
+
+  const createTodo = (todoItemValue) => {
+    ipcRenderer.invoke("todo:create", { ref: "main", text: todoItemValue });
+    todoValue.value = "";
+    todoValue.focus();
+  };
+
   todoValue.addEventListener("keypress", (event) => {
     if (event.key === "Enter") {
-      ipcRenderer.invoke("todo:create", { ref: "main", text: todoValue.value });
-      todoValue.value = "";
-      todoValue.focus();
+      createTodo(todoValue.value);
     }
   });
 
@@ -81,9 +87,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const addBtn = document.getElementById("addBtn");
   addBtn.addEventListener("click", () => {
-    ipcRenderer.invoke("todo:create", { ref: "main", text: todoValue.value });
-    todoValue.value = "";
-    todoValue.focus();
+    createTodo(todoValue.value);
   });
 
   ipcRenderer.on("todo:created", (_event, todoItem) => {

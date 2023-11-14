@@ -30,7 +30,8 @@ let newTodoWindow;
 const createNewTodoWindow = () => {
   newTodoWindow = new BrowserWindow({
     width: 480,
-    height: 200,
+    height: 215,
+    frame: false,
     webPreferences: {
       preload: path.join(app.getAppPath(), "/src/newTodoWindowPreload.js"),
     },
@@ -91,6 +92,10 @@ const handlerIpcMain = () => {
     mainWindow.focus();
   });
 
+  ipcMain.handle("todo:cancel-close", () => {
+    newTodoWindow.close();
+  });
+
   ipcMain.handle("todo:create", (_event, todoValue) => {
     todoList.push(todoValue.text);
     mainWindow.webContents.send("todo:created", {
@@ -98,6 +103,11 @@ const handlerIpcMain = () => {
       text: todoValue.text,
       addedOnDate: new Date().toLocaleString(),
     });
+
+    if (todoValue.ref === "todo") {
+      newTodoWindow.close();
+      newTodoWindow = null;
+    }
   });
 };
 
