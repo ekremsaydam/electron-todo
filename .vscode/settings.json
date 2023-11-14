@@ -1,0 +1,11 @@
+{
+    "sqltools.useNodeRuntime": true,
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "todo",
+            "database": "${workspaceFolder:electron-todo}/src/db/todo.db"
+        }
+    ]
+}

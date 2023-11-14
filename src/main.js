@@ -1,13 +1,14 @@
 const { app, BrowserWindow, MenuItem, Menu, ipcMain } = require("electron");
 const path = require("node:path");
 
+const db = require("../lib/connectionSqlite3");
+
 const isMac = process.platform === "darwin";
 
 const isDev = process.env.NODE_ENV === "development";
 // const isDev = true;
-const todoList = [];
 
-let mainWindow;
+let mainWindow = new BrowserWindow();
 const createMainWindow = () => {
   mainWindow = new BrowserWindow({
     width: 800,
@@ -22,7 +23,16 @@ const createMainWindow = () => {
   mainWindow.loadFile(path.join(app.getAppPath(), "/pages/mainWindow.html"));
 
   mainWindow.on("closed", () => {
-    if (!isMac) app.quit();
+    if (!isMac) {
+      app.quit();
+      db.close();
+    }
+  });
+
+  mainWindow.webContents.once("dom-ready", () => {
+    db.all("SELECT * FROM todo", function (err, rows) {
+      mainWindow.webContents.send("todo:list", rows);
+    });
   });
 };
 
@@ -82,14 +92,17 @@ const createMainMenu = () => {
   Menu.setApplicationMenu(mainMenu);
 };
 
+const mainWindowFocus = () => {
+  mainWindow.blur();
+  mainWindow.focus();
+};
 const handlerIpcMain = () => {
   ipcMain.handle("main:close", (_event) => {
     mainWindow.close();
   });
 
   ipcMain.handle("main:close-cancel", () => {
-    mainWindow.blur();
-    mainWindow.focus();
+    mainWindowFocus();
   });
 
   ipcMain.handle("todo:cancel-close", () => {
@@ -97,17 +110,38 @@ const handlerIpcMain = () => {
   });
 
   ipcMain.handle("todo:create", (_event, todoValue) => {
-    todoList.push(todoValue.text);
-    mainWindow.webContents.send("todo:created", {
-      id: todoList.length,
-      text: todoValue.text,
-      addedOnDate: new Date().toLocaleString(),
+    db.run("INSERT INTO todo (text) VALUES (?)", [todoValue.text], function (error, val) {
+      if (error) {
+        console.log(err.message);
+        return;
+      }
+
+      if (this.changes === 1) {
+        db.all("SELECT * FROM todo WHERE id=?", [this.lastID], function (error, rows) {
+          if (error) {
+            return console.log(error.message);
+          }
+
+          mainWindow.webContents.send("todo:created", rows[0]);
+        });
+      }
     });
 
     if (todoValue.ref === "todo") {
       newTodoWindow.close();
       newTodoWindow = null;
     }
+  });
+
+  ipcMain.handle("todo:delete", (_event, deleteTodoId) => {
+    db.run("DELETE FROM todo Where id=?", deleteTodoId, function (error) {
+      if (error) {
+        console.log(error.message);
+        return;
+      }
+
+      mainWindowFocus();
+    });
   });
 };
 

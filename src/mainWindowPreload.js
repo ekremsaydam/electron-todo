@@ -29,13 +29,18 @@ window.addEventListener("DOMContentLoaded", () => {
     const todoHeadingSmallDelete = document.createElement("i");
     todoHeadingSmallDelete.setAttribute("data-id", todoItem.id);
     // todoHeadingSmallDelete.className = "fa-regular fa-trash-can";
-    todoHeadingSmallDelete.className = "bi bi-trash-fill text-danger";
+    todoHeadingSmallDelete.className = "todo-delete bi bi-trash-fill text-danger";
     todoHeadingSmallDelete.style.fontSize = "large";
     todoHeadingSmallDelete.style.cursor = "pointer";
     todoHeadingSmallDelete.style.margin = "15px 0;";
     todoHeadingSmallDelete.addEventListener("click", (event) => {
-      event.target.parentNode.parentNode.parentNode.remove();
-      countTodo();
+      if (confirm("Are you sure you want to delete it?")) {
+        ipcRenderer.invoke("todo:delete", event.target.getAttribute("data-id"));
+        event.target.parentNode.parentNode.parentNode.remove();
+        countTodo();
+      } else {
+        ipcRenderer.invoke("main:close-cancel");
+      }
     });
     todoHeadingSmall.appendChild(todoHeadingSmallDelete);
     todoHeading.appendChild(todoHeadingH5);
@@ -92,5 +97,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
   ipcRenderer.on("todo:created", (_event, todoItem) => {
     addTodoItem(todoItem);
+  });
+
+  ipcRenderer.on("todo:list", (_event, items) => {
+    items.forEach((todoItem) => {
+      addTodoItem(todoItem);
+    });
   });
 });

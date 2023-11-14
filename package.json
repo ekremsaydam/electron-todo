@@ -17,5 +17,8 @@
     "bootstrap": "^5.3.2",
     "bootstrap-icons": "^1.11.1",
     "electron": "^27.0.4"
+  },
+  "dependencies": {
+    "sqlite3": "^5.1.6"
   }
 }
